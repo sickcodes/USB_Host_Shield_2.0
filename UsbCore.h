@@ -104,7 +104,7 @@ typedef MAX3421e<P10, P9> MAX3421E; // Official Arduinos (UNO, Duemilanove, Mega
 #define USB_ERROR_FailGetConfDescr                      0xE3
 #define USB_ERROR_TRANSFER_TIMEOUT                      0xFF
 
-#define USB_XFER_TIMEOUT        5000    // (5000) USB transfer timeout in milliseconds, per section 9.2.6.1 of USB 2.0 spec
+#define USB_XFER_TIMEOUT        50    // (5000) USB transfer timeout in milliseconds, per section 9.2.6.1 of USB 2.0 spec
 //#define USB_NAK_LIMIT         32000   // NAK limit for a transfer. 0 means NAKs are not counted
 #define USB_RETRY_LIMIT         3       // 3 retry limit for a transfer
 #define USB_SETTLE_DELAY        200     // settle delay in milliseconds
@@ -270,6 +270,8 @@ public:
 
         uint8_t ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bRequest, uint8_t wValLo, uint8_t wValHi,
                 uint16_t wInd, uint16_t total, uint16_t nbytes, uint8_t* dataptr, USBReadParser *p);
+        uint8_t ctrlReq_SETUP(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bRequest, uint8_t wValLo, uint8_t wValHi,
+                uint16_t wInd, uint16_t total);
 
 private:
         void init();

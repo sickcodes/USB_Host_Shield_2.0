@@ -201,6 +201,37 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
         return dispatchPkt((direction) ? tokOUTHS : tokINHS, ep, nak_limit); //GET if direction
 }
 
+uint8_t USB::ctrlReq_SETUP(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bRequest, uint8_t wValLo, uint8_t wValHi,
+        uint16_t wInd, uint16_t total) {
+        bool direction = false; //request direction, IN or OUT
+        uint8_t rcode;
+        SETUP_PKT setup_pkt;
+
+        EpInfo *pep = NULL;
+        uint16_t nak_limit = 0;
+
+        rcode = SetAddress(addr, ep, &pep, &nak_limit);
+
+        if(rcode)
+                return rcode;
+
+        direction = ((bmReqType & 0x80) > 0);
+
+        /* fill in setup packet */
+        setup_pkt.ReqType_u.bmRequestType = bmReqType;
+        setup_pkt.bRequest = bRequest;
+        setup_pkt.wVal_u.wValueLo = wValLo;
+        setup_pkt.wVal_u.wValueHi = wValHi;
+        setup_pkt.wIndex = wInd;
+        setup_pkt.wLength = total;
+
+        bytesWr(rSUDFIFO, 8, (uint8_t*) & setup_pkt); //transfer to setup packet FIFO
+
+        rcode = dispatchPkt(tokSETUP, ep, nak_limit); //dispatch packet
+
+        return rcode;
+}
+
 /* IN transfer to arbitrary endpoint. Assumes PERADDR is set. Handles multiple packets if necessary. Transfers 'nbytes' bytes. */
 /* Keep sending INs and writes data to memory area pointed by 'data'                                                           */
 
